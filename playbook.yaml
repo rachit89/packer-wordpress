@@ -1,0 +1,28 @@
+---
+# playbook.yml
+- name: 'Image Provisoning'
+  hosts: all
+  remote_user: ubuntu
+  become: true
+
+  tasks:
+    - name: Nodejs and ruby-full
+      apt: 
+        name:
+        - nodejs
+        - ruby-full
+
+    - name: cloudwatch
+      apt:
+        deb: https://s3.us-east-2.amazonaws.com/amazoncloudwatch-agent-us-east-2/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+
+    - name: codedeploy install script fetch
+      ansible.builtin.get_url:
+        url: https://aws-codedeploy-us-east-2.s3.us-east-2.amazonaws.com/latest/install
+        dest: /home/ubuntu/
+        mode: '0777'
+
+    - name: run codedeploy install script
+      shell: /home/ubuntu/install auto
+      args:
+        executable: bash
